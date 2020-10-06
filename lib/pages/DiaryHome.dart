@@ -10,6 +10,7 @@ bool titleErr = false;
 String title;
 bool descriptionErr = false;
 String description;
+List<DiaryCard> diaryCards = <DiaryCard>[];
 final _formKey = GlobalKey<FormState>();
 
 class _DiaryHomeState extends State<DiaryHome> {
@@ -192,11 +193,19 @@ class _DiaryHomeState extends State<DiaryHome> {
                           if (_formKey.currentState.validate()) {
                             if (titleErr == false && descriptionErr == false) {
                               _formKey.currentState.reset();
-                              print("Title: " + title);
-                              print("Description: " + description);
+                              diaryCards.add(DiaryCard(
+                                title: title,
+                                description: description,
+                                subTitle: 'Sample Subtitle',
+                              ));
                             } else if (titleErr == true ||
                                 descriptionErr == true) {
-                              print("Error Occured");
+                              if (titleErr == true) {
+                                print("Missing Title");
+                              }
+                              if (descriptionErr == true) {
+                                print("Missing Description");
+                              }
                             }
                           }
                         },
@@ -213,6 +222,9 @@ class _DiaryHomeState extends State<DiaryHome> {
                   ],
                 ),
               ),
+              Column(
+                children: diaryCards,
+              )
             ],
           ),
         )),
