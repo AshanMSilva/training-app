@@ -222,7 +222,7 @@ class _DiaryHomeState extends State<DiaryHome>
       ),
       margin: EdgeInsets.only(left: 5, right: 5),
       alignment: Alignment.centerLeft,
-      height: 50.0,
+      height: 55.0,
       width: titleFieldWidth,
       duration: Duration(milliseconds: 500),
       curve: Curves.fastOutSlowIn,
