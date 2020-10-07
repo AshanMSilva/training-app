@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:training_app/bloc/diary_bloc.dart';
 import 'package:training_app/components/DiaryCard.dart';
+
+import 'package:training_app/src/entities/diary_entity.dart';
 
 class DiaryHome extends StatefulWidget {
   @override
@@ -11,7 +15,6 @@ bool titleErr = false; //to handle title required err
 String title;
 bool descriptionErr = false; //to handle description require err
 String description;
-List<DiaryCard> diaryCards = <DiaryCard>[];
 bool expandDescription = false; //to expand the description err
 final _formKey = GlobalKey<FormState>();
 
@@ -152,18 +155,16 @@ class _DiaryHomeState extends State<DiaryHome>
           if (_formKey.currentState.validate()) {
             if (titleErr == false && descriptionErr == false) {
               _formKey.currentState.reset();
-              // diaryCards.add();
+
+              BlocProvider.of<DiaryBloc>(context).add(AddDiaryEvent(
+                  diaryEntity: DiaryEntity(
+                      title: title,
+                      subTitle: 'Sample Subtitle',
+                      description: description)));
+
               setState(() {
                 expandDescription = false;
                 titleFieldWidth = 170;
-                diaryCards = [
-                  ...diaryCards,
-                  DiaryCard(
-                    title: title,
-                    description: description,
-                    subTitle: 'Sample Subtitle',
-                  )
-                ];
               });
               _runExpandCheck();
             } else if (titleErr == true || descriptionErr == true) {
@@ -294,8 +295,40 @@ class _DiaryHomeState extends State<DiaryHome>
 
 //create diary card list
   Widget _buildDiaryCardsList() {
-    return Column(
-      children: diaryCards,
+    return BlocBuilder<DiaryBloc, DiaryState>(
+      builder: (context, state) {
+        if (state is DiaryAddedState) {
+          return ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: state.diaries.length,
+            itemBuilder: (BuildContext context, int index) {
+              return DiaryCard(
+                title: state.diaries[index].title,
+                subTitle: state.diaries[index].subTitle,
+                description: state.diaries[index].description,
+              );
+            },
+          );
+        } else if (state is DiaryInitial) {
+          return ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: state.diaries.length,
+            itemBuilder: (BuildContext context, int index) {
+              return DiaryCard(
+                title: state.diaries[index].title,
+                subTitle: state.diaries[index].subTitle,
+                description: state.diaries[index].description,
+              );
+            },
+          );
+        } else {
+          return ListView();
+        }
+      },
     );
   }
 
