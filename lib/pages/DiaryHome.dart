@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:training_app/bloc/diary_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:training_app/bloc/post_bloc.dart';
 import 'package:training_app/components/DiaryCard.dart';
 
-import 'package:training_app/src/entities/diary_entity.dart';
+import 'package:training_app/src/models/models.dart';
 
 class DiaryHome extends StatefulWidget {
   @override
@@ -156,11 +158,12 @@ class _DiaryHomeState extends State<DiaryHome>
             if (titleErr == false && descriptionErr == false) {
               _formKey.currentState.reset();
 
-              BlocProvider.of<DiaryBloc>(context).add(AddDiaryEvent(
-                  diaryEntity: DiaryEntity(
+              BlocProvider.of<PostBloc>(context).add(AddPostEvent(
+                  post: Post(
                       title: title,
-                      subTitle: 'Sample Subtitle',
-                      description: description)));
+                      user: 'Sample Subtitle',
+                      description: description,
+                      created: Timestamp.now())));
 
               setState(() {
                 expandDescription = false;
@@ -295,35 +298,83 @@ class _DiaryHomeState extends State<DiaryHome>
 
 //create diary card list
   Widget _buildDiaryCardsList() {
-    return BlocBuilder<DiaryBloc, DiaryState>(
+    return BlocBuilder<PostBloc, PostState>(
       builder: (context, state) {
-        if (state is DiaryAddedState) {
-          return ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            itemCount: state.diaries.length,
-            itemBuilder: (BuildContext context, int index) {
-              return DiaryCard(
-                title: state.diaries[index].title,
-                subTitle: state.diaries[index].subTitle,
-                description: state.diaries[index].description,
-              );
-            },
+        if (state is PostAddedState) {
+          return StreamBuilder(
+              stream: state.posts,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error Occured');
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: SpinKitFadingCircle(
+                      color: Colors.white,
+                      size: 50.0,
+                    ),
+                  );
+                } else {
+                  List<Post> listPosts = snapshot.data;
+                  return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: listPosts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return DiaryCard(
+                        title: listPosts[index].title,
+                        subTitle: listPosts[index].user,
+                        description: listPosts[index].description,
+                      );
+                    },
+                  );
+                }
+              });
+        } else if (state is PostInitial) {
+          return StreamBuilder(
+              stream: state.posts,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error Occured');
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: SpinKitFadingCircle(
+                      color: Colors.white,
+                      size: 50.0,
+                    ),
+                  );
+                } else {
+                  List<Post> listPosts = snapshot.data;
+                  return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: listPosts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return DiaryCard(
+                        title: listPosts[index].title,
+                        subTitle: listPosts[index].user,
+                        description: listPosts[index].description,
+                      );
+                    },
+                  );
+                }
+              });
+        } else if (state is LoadingState) {
+          // print('Loading State');
+          return Center(
+            child: SpinKitFadingCircle(
+              color: Colors.white,
+              size: 50.0,
+            ),
           );
-        } else if (state is DiaryInitial) {
-          return ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            itemCount: state.diaries.length,
-            itemBuilder: (BuildContext context, int index) {
-              return DiaryCard(
-                title: state.diaries[index].title,
-                subTitle: state.diaries[index].subTitle,
-                description: state.diaries[index].description,
-              );
-            },
+        } else if (state is ErrorState) {
+          return Center(
+            child: Text(state.error),
           );
         } else {
           return ListView();
@@ -386,7 +437,9 @@ class _DiaryHomeState extends State<DiaryHome>
                       ),
                       Text(
                         'You are Here: Home',
-                        style: TextStyle(color: Colors.white.withOpacity(.5)),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(.5),
+                        ),
                       ),
                     ],
                   ),
