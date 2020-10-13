@@ -20,13 +20,26 @@ kTextFieldBoxDecoration({double radius}) {
   );
 }
 
-kTextFieldInputDecoration(
-    {String hintText, double top, double left, double right, double bottom}) {
+kTextFieldInputDecoration({
+  String hintText,
+  double top,
+  double left,
+  double right,
+  double bottom,
+}) {
   return InputDecoration(
     border: InputBorder.none,
-    contentPadding: EdgeInsets.fromLTRB(left, top, right, bottom),
+    contentPadding: EdgeInsets.fromLTRB(
+      left,
+      top,
+      right,
+      bottom,
+    ),
     hintText: hintText,
-    hintStyle: TextStyle(color: Color(0xff40545e), fontSize: 14),
+    hintStyle: TextStyle(
+      color: Color(0xff40545e),
+      fontSize: 14,
+    ),
   );
 }
 

@@ -27,6 +27,7 @@ class DiaryCard extends StatelessWidget {
             children: <Widget>[
               BlocBuilder<DiaryCardBloc, DiaryCardState>(
                 builder: (context, state) {
+                  print('Build DiaryCard title Field.....');
                   return Text(
                     title,
                     maxLines: state.maxLinesTitle,
@@ -40,6 +41,7 @@ class DiaryCard extends StatelessWidget {
               ),
               BlocBuilder<DiaryCardBloc, DiaryCardState>(
                 builder: (context, state) {
+                  print('Build DiaryCard subTitle Field.....');
                   return Text(
                     subTitle,
                     maxLines: state.maxLinesSubtitle,
@@ -53,6 +55,7 @@ class DiaryCard extends StatelessWidget {
               ),
               BlocBuilder<DiaryCardBloc, DiaryCardState>(
                 builder: (context, state) {
+                  print('Build DiaryCard Description Field.....');
                   return Text(
                     description,
                     maxLines: state.maxLinesDescription,
@@ -66,6 +69,7 @@ class DiaryCard extends StatelessWidget {
               ),
               BlocBuilder<DiaryCardBloc, DiaryCardState>(
                 builder: (context, state) {
+                  print('Build Diary Card Button.....');
                   return FlatButton(
                     padding: EdgeInsets.only(left: -12),
                     shape: RoundedRectangleBorder(
